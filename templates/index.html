@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Métodos Numéricos — Calculadora</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- ═══ Sidebar ═══ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-text">MétodosNum</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-item active" data-method="euler" onclick="selectMethod('euler')">
+                <span>Euler Mejorado</span>
+            </button>
+            <button class="nav-item" data-method="runge" onclick="selectMethod('runge')">
+                <span>Runge-Kutta</span>
+            </button>
+            <button class="nav-item" data-method="newton" onclick="selectMethod('newton')">
+                <span>Newton-Raphson</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <p>Tomas Eduardo Villegas Gómez - Practica Rosales IDYGS 8-A</p>
+        </div>
+    </aside>
+
+    <!-- ═══ Mobile top bar ═══ -->
+    <header class="mobile-bar">
+        <button class="hamburger" onclick="toggleSidebar()">
+            ☰
+        </button>
+        <span class="mobile-title">Métodos Numéricos</span>
+    </header>
+
+    <!-- ═══ Main content ═══ -->
+    <main class="main-content">
+        <!-- Hero -->
+        <section class="hero-section">
+            <h1 class="hero-title" id="heroTitle">Euler Mejorado</h1>
+            <p class="hero-subtitle" id="heroSubtitle">Método de Heun para resolver Ecuaciones Diferenciales Ordinarias</p>
+        </section>
+
+        <!-- ═══ EULER ═══ -->
+        <section class="method-panel active" id="eulerPanel">
+            <div class="glass-card info-card" id="eulerInfo">
+                <button class="info-toggle" onclick="toggleInfo('eulerInfo')">
+                    ¿Cómo funciona?
+                </button>
+                <div class="info-body">
+                    <p>También conocido como <strong>Método de Heun</strong>, resuelve EDOs de la forma <code>dy/dx = f(x, y)</code></p>
+                    <div class="formula-box">
+                        y<sub>n+1</sub> = y<sub>n</sub> + (h/2)·[f(x<sub>n</sub>, y<sub>n</sub>) + f(x<sub>n+1</sub>, ỹ<sub>n+1</sub>)]
+                    </div>
+                    <p>Donde: <code>ỹ<sub>n+1</sub> = y<sub>n</sub> + h·f(x<sub>n</sub>, y<sub>n</sub>)</code></p>
+                </div>
+            </div>
+
+            <form class="glass-card form-card" onsubmit="calculate('euler', event)">
+                <div class="form-group full-width">
+                    <label>Función f(x, y)</label>
+                    <input type="text" id="eulerFunction" value="3*x + 2*y" placeholder="Ej: 3*x + 2*y" required>
+                    <span class="input-hint">Operadores: +  -  *  /  **  sin()  cos()  exp()  sqrt()  log()  pow()</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>x₀ (inicial)</label>
+                        <input type="number" id="eulerX0" step="any" value="0" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>y₀ (inicial)</label>
+                        <input type="number" id="eulerY0" step="any" value="1" placeholder="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>x<sub>f</sub> (final)</label>
+                        <input type="number" id="eulerXf" step="any" value="2" placeholder="2" required>
+                    </div>
+                    <div class="form-group">
+                        <label>h (paso)</label>
+                        <input type="number" id="eulerH" step="any" value="0.5" placeholder="0.5" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="eulerBtn">
+                    Calcular
+                </button>
+            </form>
+
+            <div id="eulerResults"></div>
+        </section>
+
+        <!-- ═══ RUNGE-KUTTA ═══ -->
+        <section class="method-panel" id="rungePanel">
+            <div class="glass-card info-card" id="rungeInfo">
+                <button class="info-toggle" onclick="toggleInfo('rungeInfo')">
+                    ¿Cómo funciona?
+                </button>
+                <div class="info-body">
+                    <p>Método de <strong>4to orden</strong> para EDOs. Usa 4 evaluaciones por paso:</p>
+                    <div class="formula-box">
+                        k₁ = f(xₙ, yₙ)<br>
+                        k₂ = f(xₙ + h/2, yₙ + h·k₁/2)<br>
+                        k₃ = f(xₙ + h/2, yₙ + h·k₂/2)<br>
+                        k₄ = f(xₙ + h, yₙ + h·k₃)
+                    </div>
+                    <div class="formula-box">
+                        y<sub>n+1</sub> = y<sub>n</sub> + (h/6)·(k₁ + 2k₂ + 2k₃ + k₄)
+                    </div>
+                </div>
+            </div>
+
+            <form class="glass-card form-card" onsubmit="calculate('runge', event)">
+                <div class="form-group full-width">
+                    <label>Función f(x, y)</label>
+                    <input type="text" id="rungeFunction" value="x + y" placeholder="Ej: x + y" required>
+                    <span class="input-hint">Operadores: +  -  *  /  **  sin()  cos()  exp()  sqrt()  log()  pow()</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>x₀ (inicial)</label>
+                        <input type="number" id="rungeX0" step="any" value="0" placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>y₀ (inicial)</label>
+                        <input type="number" id="rungeY0" step="any" value="1" placeholder="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>x<sub>f</sub> (final)</label>
+                        <input type="number" id="rungeXf" step="any" value="2" placeholder="2" required>
+                    </div>
+                    <div class="form-group">
+                        <label>h (paso)</label>
+                        <input type="number" id="rungeH" step="any" value="0.5" placeholder="0.5" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="rungeBtn">
+                    Calcular
+                </button>
+            </form>
+
+            <div id="rungeResults"></div>
+        </section>
+
+        <!-- ═══ NEWTON-RAPHSON ═══ -->
+        <section class="method-panel" id="newtonPanel">
+            <div class="glass-card info-card" id="newtonInfo">
+                <button class="info-toggle" onclick="toggleInfo('newtonInfo')">
+                    ¿Cómo funciona?
+                </button>
+                <div class="info-body">
+                    <p>Método iterativo para encontrar <strong>raíces</strong> de f(x) = 0.</p>
+                    <div class="formula-box">
+                        x<sub>n+1</sub> = x<sub>n</sub> − f(x<sub>n</sub>) / f'(x<sub>n</sub>)
+                    </div>
+                    <p>Si no proporcionas la derivada, se calculará numéricamente.</p>
+                </div>
+            </div>
+
+            <form class="glass-card form-card" onsubmit="calculate('newton', event)">
+                <div class="form-group full-width">
+                    <label>Función f(x)</label>
+                    <input type="text" id="newtonFunction" value="x**3 - 2*x - 5" placeholder="Ej: x**3 - 2*x - 5" required>
+                    <span class="input-hint">Operadores: +  -  *  /  **  sin()  cos()  exp()  sqrt()  log()  pow()</span>
+                </div>
+                <div class="form-group full-width">
+                    <label>Derivada f'(x) <span class="optional-badge">opcional</span></label>
+                    <input type="text" id="newtonDerivative" value="3*x**2 - 2" placeholder="Ej: 3*x**2 - 2 (vacío = cálculo numérico)">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>x₀ (inicial)</label>
+                        <input type="number" id="newtonX0" step="any" value="2" placeholder="2" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tolerancia</label>
+                        <input type="number" id="newtonTol" step="any" placeholder="0.0001" value="0.0001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Máx. iteraciones</label>
+                        <input type="number" id="newtonMaxIter" placeholder="100" value="100" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" id="newtonBtn">
+                    Calcular
+                </button>
+            </form>
+
+            <div id="newtonResults"></div>
+        </section>
+    </main>
+
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
