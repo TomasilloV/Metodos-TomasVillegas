@@ -87,8 +87,8 @@ async function calculate(method, event) {
 
         if (!res.ok) throw new Error(data.error || 'Error desconocido');
 
-        if (method === 'euler')  renderEuler(data.results, body.funcion);
-        if (method === 'runge')  renderRunge(data.results, body.funcion);
+        if (method === 'euler')  renderEuler(data.results, body.funcion, data.warning);
+        if (method === 'runge')  renderRunge(data.results, body.funcion, data.warning);
         if (method === 'newton') renderNewton(data.results, data.converged, body);
 
     } catch (err) {
@@ -167,12 +167,14 @@ function makeChart(canvasId, labels, datasets, title) {
    RENDER: Euler Mejorado
    ──────────────────────────────────────────── */
 
-function renderEuler(results, funcStr) {
+function renderEuler(results, funcStr, warning) {
     const last = results[results.length - 1];
     const container = document.getElementById('eulerResults');
+    const warningHtml = warning ? `<div class="warning-card">${warning}</div>` : '';
 
     container.innerHTML = `
         <div class="results-wrapper">
+            ${warningHtml}
             <div class="summary-card">
                 <div class="summary-header">
                     <h3>Resultados — Euler Mejorado (Heun)</h3>
@@ -231,12 +233,14 @@ function renderEuler(results, funcStr) {
    RENDER: Runge-Kutta
    ──────────────────────────────────────────── */
 
-function renderRunge(results, funcStr) {
+function renderRunge(results, funcStr, warning) {
     const last = results[results.length - 1];
     const container = document.getElementById('rungeResults');
+    const warningHtml = warning ? `<div class="warning-card">${warning}</div>` : '';
 
     container.innerHTML = `
         <div class="results-wrapper">
+            ${warningHtml}
             <div class="summary-card">
                 <div class="summary-header">
                     <h3>Resultados — Runge-Kutta RK4</h3>

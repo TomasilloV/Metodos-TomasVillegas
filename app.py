@@ -71,6 +71,18 @@ def euler_mejorado():
 
             y_new = y + (h / 2) * (k1 + k2)
 
+            if math.isinf(y_new) or math.isnan(y_new) or abs(y_new) > 1e308:
+                results.append({
+                    "i": n + 1,
+                    "x": round_to(x_next, 6),
+                    "fxy": round_to(fxy, 6),
+                    "k1": round_to(k1, 6),
+                    "k2": round_to(k2, 6),
+                    "yNext": "Overflow",
+                    "error": "Diverge",
+                })
+                return jsonify({"results": results, "warning": "Los valores divergieron en la iteraci\u00f3n " + str(n + 1) + ". Se muestran resultados parciales."})
+
             # Relative error in scientific notation
             if abs(y_new) > 1e-12:
                 error_val = abs((y_new - y) / y_new)
@@ -94,6 +106,8 @@ def euler_mejorado():
 
         return jsonify({"results": results})
 
+    except OverflowError:
+        return jsonify({"results": results, "warning": "Los valores divergieron (overflow). Se muestran resultados parciales."})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
@@ -126,6 +140,19 @@ def runge_kutta():
             k4 = safe_eval(func_str, {"x": x + h, "y": y + h * k3})
 
             y = y + (h / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
+
+            if math.isinf(y) or math.isnan(y) or abs(y) > 1e308:
+                results.append({
+                    "i": n + 1,
+                    "xi": round_to(xi, 6),
+                    "k1": round_to(k1, 6),
+                    "k2": round_to(k2, 6),
+                    "k3": round_to(k3, 6),
+                    "k4": round_to(k4, 6),
+                    "yNext": "Overflow",
+                })
+                return jsonify({"results": results, "warning": "Los valores divergieron en la iteraci\u00f3n " + str(n + 1) + ". Se muestran resultados parciales."})
+
             x = x + h
             n += 1
 
@@ -141,6 +168,8 @@ def runge_kutta():
 
         return jsonify({"results": results})
 
+    except OverflowError:
+        return jsonify({"results": results, "warning": "Los valores divergieron (overflow). Se muestran resultados parciales."})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
